@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:share_plus/share_plus.dart';
 import '../app_state.dart';
 import '../theme.dart';
 import '../widgets/glass_panel.dart';
 import '../widgets/heritage_app_bar.dart';
+
+const _shareBaseUrl =
+    'https://1210395.github.io/jerusalem-mirror-flutter/share.html';
+
+String _buildShareUrl(String imageUrl, String? costumeName) {
+  final params = <String, String>{'img': imageUrl};
+  if (costumeName != null) params['name'] = costumeName;
+  final query = params.entries
+      .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+      .join('&');
+  return '$_shareBaseUrl?$query';
+}
 
 class ResultScreen extends StatelessWidget {
   final AppState appState;
@@ -84,64 +95,6 @@ class ResultScreen extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  GlassPanel(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 96,
-                          height: 96,
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: imageUrl != null
-                              ? QrImageView(
-                                  data: imageUrl,
-                                  version: QrVersions.auto,
-                                  backgroundColor: Colors.white,
-                                  // ignore: deprecated_member_use
-                                  foregroundColor: Colors.black,
-                                  padding: EdgeInsets.zero,
-                                )
-                              : const Center(
-                                  child: Icon(
-                                    Icons.qr_code_2,
-                                    size: 64,
-                                    color: Colors.black26,
-                                  ),
-                                ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                isArabic ? 'تذكار' : 'SOUVENIR',
-                                style: HeritageTheme.labelCaps(context,
-                                    vhFactor: 0.012),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                imageUrl == null
-                                    ? (isArabic
-                                        ? 'قيد الإنشاء…'
-                                        : 'Generating…')
-                                    : (isArabic
-                                        ? 'امسح الرمز لمشاهدة صورتك'
-                                        : 'Scan to view your reflection'),
-                                style: HeritageTheme.headlineMd(context,
-                                    vhFactor: 0.018),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
@@ -170,8 +123,9 @@ class ResultScreen extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: imageUrl == null
                               ? null
-                              : () => _share(context, imageUrl, costume?.nameEn),
-                          icon: const Icon(Icons.share,
+                              : () => _openShareDialog(
+                                  context, imageUrl, costume),
+                          icon: const Icon(Icons.qr_code_2,
                               color: HeritageColors.onPrimary),
                           label: Text(
                             isArabic ? 'شارك' : 'SHARE',
@@ -201,13 +155,109 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _share(
-      BuildContext context, String imageUrl, String? costumeName) async {
+  void _openShareDialog(BuildContext context, String imageUrl, dynamic costume) {
     final isArabic = appState.locale == 'ar';
-    final text = isArabic
-        ? 'انعكاسي التراثي من مرآة القدس${costumeName != null ? ' - $costumeName' : ''}\n$imageUrl'
-        : 'My Jerusalem Heritage reflection${costumeName != null ? ' - $costumeName' : ''}\n$imageUrl';
-    await Share.share(text);
+    final costumeName = costume == null
+        ? null
+        : (isArabic ? costume.nameAr as String : costume.nameEn as String);
+    final shareUrl = _buildShareUrl(imageUrl, costumeName);
+
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (ctx) => Dialog(
+        backgroundColor: HeritageColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: HeritageColors.primaryContainer.withOpacity(0.4),
+          ),
+        ),
+        insetPadding: const EdgeInsets.all(24),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                isArabic ? 'تذكارك' : 'YOUR SOUVENIR',
+                style: HeritageTheme.labelCaps(context, vhFactor: 0.013),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                isArabic
+                    ? 'امسح الرمز للحصول على صورتك'
+                    : 'Scan to get your reflection',
+                style: HeritageTheme.headlineMd(context, vhFactor: 0.022),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color:
+                          HeritageColors.primaryContainer.withOpacity(0.3),
+                      blurRadius: 24,
+                    ),
+                  ],
+                ),
+                child: QrImageView(
+                  data: shareUrl,
+                  version: QrVersions.auto,
+                  size: 240,
+                  backgroundColor: Colors.white,
+                  // ignore: deprecated_member_use
+                  foregroundColor: Colors.black,
+                  errorCorrectionLevel: QrErrorCorrectLevel.M,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (costumeName != null)
+                Text(
+                  costumeName,
+                  style: HeritageTheme.body(context, vhFactor: 0.016)
+                      .copyWith(color: HeritageColors.primary),
+                  textAlign: TextAlign.center,
+                ),
+              const SizedBox(height: 4),
+              Text(
+                isArabic
+                    ? 'يفتح صفحة تنزيل تراثية'
+                    : 'Opens a heritage download page',
+                style: HeritageTheme.body(context, vhFactor: 0.013),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: HeritageColors.primaryContainer,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    isArabic ? 'إغلاق' : 'CLOSE',
+                    style: HeritageTheme.labelCaps(context, vhFactor: 0.014)
+                        .copyWith(
+                      color: HeritageColors.onPrimary,
+                      letterSpacing: 3,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _placeholder(BuildContext context) {
