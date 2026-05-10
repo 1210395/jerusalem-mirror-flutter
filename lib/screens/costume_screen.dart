@@ -12,6 +12,11 @@ class CostumeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isArabic = appState.locale == 'ar';
+    final visibleCostumes = appState.gender == null
+        ? heritageCostumes
+        : heritageCostumes
+            .where((c) => c.imageGender == appState.gender)
+            .toList();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -58,9 +63,9 @@ class CostumeScreen extends StatelessWidget {
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
                       ),
-                      itemCount: heritageCostumes.length,
+                      itemCount: visibleCostumes.length,
                       itemBuilder: (context, index) {
-                        final c = heritageCostumes[index];
+                        final c = visibleCostumes[index];
                         final selected = appState.selectedCostume?.id == c.id;
                         return _CostumeCard(
                           costume: c,

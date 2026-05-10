@@ -66,12 +66,22 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       final bytes = await File(photo).readAsBytes();
       final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
 
-      final basePrompt = widget.appState.gender == 'female'
-          ? c.aiPromptFemale
-          : c.aiPromptMale;
-      final prompt =
-          'Transform the person in the photo into $basePrompt, set against ${c.aiBackground}. '
-          'Cinematic museum-quality lighting, photorealistic, preserve facial features.';
+      final isFemale = widget.appState.gender == 'female';
+      final genderNoun = isFemale ? 'woman' : 'man';
+      final costumeDescription =
+          isFemale ? c.aiPromptFemale : c.aiPromptMale;
+
+      final prompt = [
+        'Photorealistic full-body heritage portrait of the same $genderNoun shown in the input photo,',
+        'preserving the original face, identity, age, skin tone, and expression exactly.',
+        'Re-dress this $genderNoun as $costumeDescription.',
+        'This is the ${c.nameEn} (${c.era}, ${c.regionEn}) — ${c.descriptionEn}',
+        'Setting: ${c.aiBackground}.',
+        'Cinematic museum-gallery lighting, warm key light, subtle gold rim light,',
+        'sharp focus on textile texture and embroidery details, shallow depth of field.',
+        'Composition: 3:4 portrait, dignified posture, garment fully visible.',
+        'No cartoon, no painting style, no text, no watermark.',
+      ].join(' ');
 
       final url = await FalAiClient.generateImage(
         imageBase64: base64Image,

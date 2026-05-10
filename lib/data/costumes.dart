@@ -12,6 +12,11 @@ class Costume {
   final String aiBackground;
   final int colorHex;
 
+  /// The gender depicted in the costume's reference photograph
+  /// (`'male'` or `'female'`). Used to filter the costume picker after
+  /// the user has chosen their profile on the gender screen.
+  final String imageGender;
+
   const Costume({
     required this.id,
     required this.nameEn,
@@ -31,6 +36,7 @@ class Costume {
     required this.aiPromptFemale,
     required this.aiBackground,
     required this.colorHex,
+    required this.imageGender,
   });
 }
 
@@ -54,6 +60,7 @@ const List<Costume> heritageCostumes = [
     aiPromptFemale: 'a woman in a 19th century Bethlehem Malak thobe: deep cream linen with intricate red and gold Tahriri couching embroidery on chest, sleeves and hem, embroidered shatweh headdress with coins',
     aiBackground: 'Jerusalem stone wall in soft warm museum lighting with subtle Tatreez pattern hints',
     colorHex: 0xFF920703,
+    imageGender: 'female',
   ),
   Costume(
     id: 'effendi_robe',
@@ -74,6 +81,7 @@ const List<Costume> heritageCostumes = [
     aiPromptFemale: 'a woman in late Ottoman urban Jerusalem dress: long silk caftan with gold trim, embroidered shawl, headcovering with coin ornaments',
     aiBackground: 'arched Ottoman-era stone hall with hanging brass lanterns',
     colorHex: 0xFF1B1D0E,
+    imageGender: 'male',
   ),
   Costume(
     id: 'galilee_silk',
@@ -94,6 +102,7 @@ const List<Costume> heritageCostumes = [
     aiPromptFemale: 'a woman in a Galilee thobe: deep indigo linen with bright red and orange geometric cross-stitch panels, white scarf veil',
     aiBackground: 'Galilee hillside with olive groves at golden hour',
     colorHex: 0xFF1F3A5F,
+    imageGender: 'female',
   ),
   Costume(
     id: 'urban_qumbaz',
@@ -114,6 +123,7 @@ const List<Costume> heritageCostumes = [
     aiPromptFemale: 'a woman in a tailored urban qumbaz coat in deep emerald velvet with gold braid, embroidered headcovering with gold ornaments',
     aiBackground: 'arched stone palace interior with brass details and rich tapestries',
     colorHex: 0xFF2E5A3E,
+    imageGender: 'male',
   ),
   Costume(
     id: 'hebron_bridal',
@@ -134,6 +144,7 @@ const List<Costume> heritageCostumes = [
     aiPromptFemale: 'a Hebron bride in a flowing white linen ceremonial thobe with dense red and gold chest panel embroidery, ornate headdress with silver coins, henna hands',
     aiBackground: 'whitewashed Hebron stone arch with traditional wedding decoration',
     colorHex: 0xFFE4E4CC,
+    imageGender: 'female',
   ),
   Costume(
     id: 'sheikh_mantle',
@@ -154,6 +165,7 @@ const List<Costume> heritageCostumes = [
     aiPromptFemale: 'a woman in an elder\'s embroidered black mantle with white headcovering and silver chest ornaments, dignified posture',
     aiBackground: 'old mosque courtyard with worn stone columns and golden afternoon light',
     colorHex: 0xFF0E0F03,
+    imageGender: 'male',
   ),
   Costume(
     id: 'ramallah_indigo',
@@ -174,6 +186,7 @@ const List<Costume> heritageCostumes = [
     aiPromptFemale: 'a woman in a Ramallah thobe: dark navy linen with white and pale-blue cross-stitch embroidery in rhythmic patterns, white veil',
     aiBackground: 'Ramallah stone village wall with arched window at dusk',
     colorHex: 0xFF1A2A4F,
+    imageGender: 'female',
   ),
   Costume(
     id: 'jaffa_merchant',
@@ -194,5 +207,6 @@ const List<Costume> heritageCostumes = [
     aiPromptFemale: 'a woman in Jaffa coastal urban attire: layered cream and gold dress with light embroidered sash, embroidered scarf veil',
     aiBackground: 'Jaffa port at dawn with stone archways and orange crates',
     colorHex: 0xFFC9A872,
+    imageGender: 'male',
   ),
 ];
