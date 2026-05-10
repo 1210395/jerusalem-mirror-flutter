@@ -100,82 +100,136 @@ class _CaptureScreenState extends State<CaptureScreen> {
     final isArabic = widget.appState.locale == 'ar';
 
     return Scaffold(
+      backgroundColor: HeritageColors.background,
       appBar: HeritageAppBar(appState: widget.appState, showBack: true),
-      body: Stack(
-        children: [
-          // Camera or placeholder
-          Positioned.fill(child: _buildCameraLayer()),
-          // Body silhouette guide
-          if (_capturedPath == null)
-            Center(
-              child: AspectRatio(
-                aspectRatio: 3 / 4,
-                child: Container(
-                  margin: const EdgeInsets.all(48),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: HeritageColors.primaryContainer.withOpacity(0.4),
-                      width: 2,
-                      style: BorderStyle.solid,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
+            Text(
+              isArabic
+                  ? 'حاذِ نفسك مع الإطار الذهبي'
+                  : 'Align with the golden frame',
+              style: HeritageTheme.labelCaps(context, vhFactor: 0.013),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            // Constrained camera preview card
+            Expanded(
+              flex: 5,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: AspectRatio(
+                    aspectRatio: 3 / 4,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: HeritageColors.primaryContainer.withOpacity(0.4),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                HeritageColors.primaryContainer.withOpacity(0.2),
+                            blurRadius: 24,
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            _buildCameraLayer(),
+                            // Body silhouette guide (rounded oval) inside preview
+                            if (_capturedPath == null)
+                              Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: HeritageColors.primaryContainer
+                                          .withOpacity(0.5),
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(60),
+                                  ),
+                                  child: Stack(
+                                    children: _buildCornerAccents(),
+                                  ),
+                                ),
+                              ),
+                            // Countdown overlay
+                            if (_countdown > 0)
+                              Container(
+                                color: Colors.black.withOpacity(0.3),
+                                child: Center(
+                                  child: Text(
+                                    '$_countdown',
+                                    style: HeritageTheme.displayHero(context,
+                                        vhFactor: 0.16),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(80),
-                  ),
-                  child: Stack(
-                    children: [
-                      ..._buildCornerAccents(),
-                    ],
                   ),
                 ),
               ),
             ),
-          // Countdown overlay
-          if (_countdown > 0)
-            Center(
-              child: Text(
-                '$_countdown',
-                style: HeritageTheme.displayHero(context, vhFactor: 0.18),
+            // Bottom controls
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: _buildBottomControls(context, isArabic),
               ),
             ),
-          // Bottom controls
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 24,
-            child: _buildBottomControls(context, isArabic),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildCameraLayer() {
     if (_initializing) {
-      return const Center(
-        child: CircularProgressIndicator(color: HeritageColors.primary),
+      return Container(
+        color: HeritageColors.surface,
+        child: const Center(
+          child: CircularProgressIndicator(color: HeritageColors.primary),
+        ),
       );
     }
     if (_initError != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.videocam_off,
-                color: HeritageColors.primary, size: 48),
-            const SizedBox(height: 16),
-            Text(
-              _initError!,
-              style: const TextStyle(color: HeritageColors.onSurfaceVariant),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                setState(() => _initializing = true);
-                _initCamera();
-              },
-              child: const Text('Retry'),
-            ),
-          ],
+      return Container(
+        color: HeritageColors.surface,
+        padding: const EdgeInsets.all(24),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.videocam_off,
+                  color: HeritageColors.primary, size: 48),
+              const SizedBox(height: 16),
+              Text(
+                _initError!,
+                style: const TextStyle(color: HeritageColors.onSurfaceVariant),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() => _initializing = true);
+                  _initCamera();
+                },
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -186,10 +240,6 @@ class _CaptureScreenState extends State<CaptureScreen> {
   }
 
   List<Widget> _buildCornerAccents() {
-    const corner = SizedBox(
-      width: 32,
-      height: 32,
-    );
     final color = HeritageColors.primaryContainer;
     Widget accent(Alignment alignment) {
       final isTop = alignment.y < 0;
@@ -197,8 +247,8 @@ class _CaptureScreenState extends State<CaptureScreen> {
       return Align(
         alignment: alignment,
         child: Container(
-          width: 32,
-          height: 32,
+          width: 24,
+          height: 24,
           decoration: BoxDecoration(
             border: Border(
               top: isTop ? BorderSide(color: color, width: 2) : BorderSide.none,
@@ -211,7 +261,6 @@ class _CaptureScreenState extends State<CaptureScreen> {
                   : BorderSide.none,
             ),
           ),
-          child: corner,
         ),
       );
     }
@@ -226,52 +275,48 @@ class _CaptureScreenState extends State<CaptureScreen> {
 
   Widget _buildBottomControls(BuildContext context, bool isArabic) {
     if (_capturedPath != null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _ghostButton(
-              isArabic ? 'إعادة' : 'RETAKE',
-              Icons.refresh,
-              () => setState(() => _capturedPath = null),
-            ),
-            _solidButton(
-              isArabic ? 'متابعة' : 'CONTINUE',
-              Icons.check_circle,
-              () {
-                widget.appState.capturedPhotoPath = _capturedPath;
-                widget.appState.goToScreen(5);
-              },
-            ),
-          ],
-        ),
-      );
-    }
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          GlassPanel(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            radius: 40,
-            child: Text(
-              isArabic
-                  ? 'حاذِ جسمك مع الإطار الذهبي'
-                  : 'Full body aligned with guide',
-              style: HeritageTheme.headlineMd(context, vhFactor: 0.02),
-              textAlign: TextAlign.center,
-            ),
+          _ghostButton(
+            isArabic ? 'إعادة' : 'RETAKE',
+            Icons.refresh,
+            () => setState(() => _capturedPath = null),
           ),
-          const SizedBox(height: 24),
           _solidButton(
-            isArabic ? 'ابدأ' : 'START',
-            Icons.play_arrow,
-            _countdown > 0 ? null : _startCountdown,
-            big: true,
+            isArabic ? 'متابعة' : 'CONTINUE',
+            Icons.check_circle,
+            () {
+              widget.appState.capturedPhotoPath = _capturedPath;
+              widget.appState.goToScreen(5);
+            },
           ),
         ],
-      ),
+      );
+    }
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GlassPanel(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          radius: 30,
+          child: Text(
+            isArabic
+                ? 'حاذِ جسمك مع الإطار الذهبي'
+                : 'Full body aligned with guide',
+            style: HeritageTheme.body(context, vhFactor: 0.016),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _solidButton(
+          isArabic ? 'ابدأ' : 'START',
+          Icons.play_arrow,
+          _countdown > 0 ? null : _startCountdown,
+          big: true,
+        ),
+      ],
     );
   }
 
@@ -287,7 +332,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: HeritageColors.onSurfaceVariant),
+            Icon(icon, color: HeritageColors.onSurfaceVariant, size: 20),
             const SizedBox(width: 8),
             Text(
               label,
@@ -312,7 +357,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: big ? 48 : 24,
-          vertical: big ? 18 : 14,
+          vertical: big ? 16 : 14,
         ),
         decoration: BoxDecoration(
           color: onTap == null
@@ -331,7 +376,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: HeritageColors.onPrimary),
+            Icon(icon, color: HeritageColors.onPrimary, size: big ? 24 : 20),
             const SizedBox(width: 8),
             Text(
               label,

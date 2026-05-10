@@ -44,12 +44,31 @@ class GarmentDetailScreen extends StatelessWidget {
                 ),
               ),
               child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Center(
-                    child: Icon(
-                      Icons.checkroom,
-                      size: 180,
-                      color: HeritageColors.primaryContainer.withOpacity(0.4),
+                  Image.asset(
+                    'assets/images/garment_hero.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Center(
+                      child: Icon(
+                        Icons.checkroom,
+                        size: 180,
+                        color:
+                            HeritageColors.primaryContainer.withOpacity(0.4),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(costume.colorHex).withOpacity(0.3),
+                          Colors.transparent,
+                          HeritageColors.background,
+                        ],
+                      ),
                     ),
                   ),
                   Positioned(

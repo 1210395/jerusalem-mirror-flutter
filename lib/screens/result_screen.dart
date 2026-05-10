@@ -193,25 +193,31 @@ class ResultScreen extends StatelessWidget {
   }
 
   Widget _placeholder(BuildContext context) {
-    final c = appState.selectedCostume;
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(c?.colorHex ?? 0xFF2A2B1B),
-            HeritageColors.background,
-          ],
-        ),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.account_balance,
-          size: 200,
-          color: Color(0x33D4AF37),
-        ),
-      ),
+    return Image.asset(
+      'assets/images/souvenir_bg.png',
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) {
+        final c = appState.selectedCostume;
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(c?.colorHex ?? 0xFF2A2B1B),
+                HeritageColors.background,
+              ],
+            ),
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.account_balance,
+              size: 200,
+              color: Color(0x33D4AF37),
+            ),
+          ),
+        );
+      },
     );
   }
 }
