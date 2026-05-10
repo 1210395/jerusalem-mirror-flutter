@@ -7,12 +7,14 @@ class HeritageAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppState appState;
   final String? subtitle;
   final bool showBack;
+  final bool showHome;
 
   const HeritageAppBar({
     super.key,
     required this.appState,
     this.subtitle,
     this.showBack = false,
+    this.showHome = true,
   });
 
   @override
@@ -23,7 +25,7 @@ class HeritageAppBar extends StatelessWidget implements PreferredSizeWidget {
     final isArabic = appState.locale == 'ar';
     return Container(
       height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.2),
         border: Border(
@@ -54,6 +56,15 @@ class HeritageAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           LanguageToggle(appState: appState),
+          if (showHome) ...[
+            const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.home_filled,
+                  color: HeritageColors.primaryContainer),
+              tooltip: isArabic ? 'الرئيسية' : 'Home',
+              onPressed: () => appState.reset(),
+            ),
+          ],
         ],
       ),
     );

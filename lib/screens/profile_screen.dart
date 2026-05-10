@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../app_state.dart';
 import '../theme.dart';
 import '../widgets/heritage_app_bar.dart';
-import '../widgets/heritage_bottom_nav.dart';
 
 class ProfileScreen extends StatelessWidget {
   final AppState appState;
@@ -14,51 +13,78 @@ class ProfileScreen extends StatelessWidget {
     final isArabic = appState.locale == 'ar';
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: HeritageAppBar(appState: appState, showBack: true),
-      bottomNavigationBar: const HeritageBottomNav(activeIndex: 1),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Column(
-          children: [
-            const SizedBox(height: 24),
-            Text(
-              isArabic ? 'اختر انعكاسك' : 'Choose Your Reflection',
-              style: HeritageTheme.headlineLg(context),
-              textAlign: TextAlign.center,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/profile_bg.png',
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(
+              color: HeritageColors.background,
             ),
-            const SizedBox(height: 12),
-            Text(
-              isArabic
-                  ? 'اختر النوع لتخصيص تجربة المرآة التراثية'
-                  : 'Select your gender to tailor the heritage mirror experience.',
-              style: HeritageTheme.body(context),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 48),
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _GenderCard(
-                      icon: Icons.male,
-                      label: isArabic ? 'ذكر' : 'MALE',
-                      onTap: () => appState.setGender('male'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _GenderCard(
-                      icon: Icons.female,
-                      label: isArabic ? 'أنثى' : 'FEMALE',
-                      onTap: () => appState.setGender('female'),
-                    ),
-                  ),
+          ),
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xCC131407),
+                  Color(0x99131407),
+                  Color(0xEE0E0F03),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-          ],
-        ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: Column(
+                children: [
+                  const SizedBox(height: 24),
+                  Text(
+                    isArabic ? 'اختر انعكاسك' : 'Choose Your Reflection',
+                    style: HeritageTheme.headlineLg(context),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    isArabic
+                        ? 'اختر النوع لتخصيص تجربة المرآة التراثية'
+                        : 'Select your gender to tailor the heritage mirror experience.',
+                    style: HeritageTheme.body(context),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 48),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _GenderCard(
+                            icon: Icons.male,
+                            label: isArabic ? 'ذكر' : 'MALE',
+                            onTap: () => appState.setGender('male'),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _GenderCard(
+                            icon: Icons.female,
+                            label: isArabic ? 'أنثى' : 'FEMALE',
+                            onTap: () => appState.setGender('female'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -3,7 +3,6 @@ import '../app_state.dart';
 import '../data/costumes.dart';
 import '../theme.dart';
 import '../widgets/heritage_app_bar.dart';
-import '../widgets/heritage_bottom_nav.dart';
 
 class CostumeScreen extends StatelessWidget {
   final AppState appState;
@@ -15,59 +14,78 @@ class CostumeScreen extends StatelessWidget {
     final isArabic = appState.locale == 'ar';
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: HeritageAppBar(appState: appState, showBack: true),
-      bottomNavigationBar: const HeritageBottomNav(activeIndex: 1),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/costume_bg.png',
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(
+              color: HeritageColors.background,
+            ),
+          ),
+          Container(color: Colors.black.withOpacity(0.65)),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    isArabic ? 'الخزانة التاريخية' : 'HISTORICAL WARDROBE',
-                    style: HeritageTheme.labelCaps(context, vhFactor: 0.012),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isArabic
+                              ? 'الخزانة التاريخية'
+                              : 'HISTORICAL WARDROBE',
+                          style: HeritageTheme.labelCaps(context,
+                              vhFactor: 0.012),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          isArabic
+                              ? 'اختر زياً تراثياً لتجسيده'
+                              : 'Choose a heritage garment to embody',
+                          style: HeritageTheme.headlineMd(context),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    isArabic
-                        ? 'اختر زياً تراثياً لتجسيده'
-                        : 'Choose a heritage garment to embody',
-                    style: HeritageTheme.headlineMd(context),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: GridView.builder(
+                      padding: const EdgeInsets.all(8),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.62,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                      ),
+                      itemCount: heritageCostumes.length,
+                      itemBuilder: (context, index) {
+                        final c = heritageCostumes[index];
+                        final selected = appState.selectedCostume?.id == c.id;
+                        return _CostumeCard(
+                          costume: c,
+                          selected: selected,
+                          isArabic: isArabic,
+                          onTap: () {
+                            appState.selectCostume(c);
+                            appState.goToScreen(3);
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.all(8),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.62,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                ),
-                itemCount: heritageCostumes.length,
-                itemBuilder: (context, index) {
-                  final c = heritageCostumes[index];
-                  final selected = appState.selectedCostume?.id == c.id;
-                  return _CostumeCard(
-                    costume: c,
-                    selected: selected,
-                    isArabic: isArabic,
-                    onTap: () {
-                      appState.selectCostume(c);
-                      appState.goToScreen(3);
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../app_state.dart';
 import '../theme.dart';
 import '../widgets/heritage_app_bar.dart';
-import '../widgets/heritage_bottom_nav.dart';
 
 class WelcomeScreen extends StatefulWidget {
   final AppState appState;
@@ -38,8 +37,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: HeritageAppBar(appState: widget.appState),
-      bottomNavigationBar: const HeritageBottomNav(activeIndex: 0),
+      appBar: HeritageAppBar(appState: widget.appState, showHome: false),
       body: Stack(
         fit: StackFit.expand,
         children: [

@@ -236,7 +236,25 @@ class _CaptureScreenState extends State<CaptureScreen> {
     if (_capturedPath != null) {
       return Image.file(File(_capturedPath!), fit: BoxFit.cover);
     }
-    return CameraPreview(_controller!);
+    final preview = _controller!.value.previewSize;
+    if (preview == null) {
+      return CameraPreview(_controller!);
+    }
+    return ClipRect(
+      child: OverflowBox(
+        alignment: Alignment.center,
+        maxWidth: double.infinity,
+        maxHeight: double.infinity,
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: preview.height,
+            height: preview.width,
+            child: CameraPreview(_controller!),
+          ),
+        ),
+      ),
+    );
   }
 
   List<Widget> _buildCornerAccents() {

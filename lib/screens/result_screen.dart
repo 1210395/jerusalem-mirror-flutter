@@ -3,7 +3,6 @@ import '../app_state.dart';
 import '../theme.dart';
 import '../widgets/glass_panel.dart';
 import '../widgets/heritage_app_bar.dart';
-import '../widgets/heritage_bottom_nav.dart';
 
 class ResultScreen extends StatelessWidget {
   final AppState appState;
@@ -21,7 +20,6 @@ class ResultScreen extends StatelessWidget {
         appState: appState,
         subtitle: isArabic ? 'الكشف النهائي' : 'STEP 10: FINAL REVEAL',
       ),
-      bottomNavigationBar: const HeritageBottomNav(activeIndex: 1),
       body: Stack(
         children: [
           // Hero image background

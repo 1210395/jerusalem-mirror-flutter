@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import '../app_state.dart';
-import '../data/costumes.dart';
 import '../theme.dart';
 import '../widgets/glass_panel.dart';
 import '../widgets/heritage_app_bar.dart';
-import '../widgets/heritage_bottom_nav.dart';
 
 class GarmentDetailScreen extends StatelessWidget {
   final AppState appState;
@@ -25,7 +23,6 @@ class GarmentDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: HeritageAppBar(appState: appState, showBack: true),
-      bottomNavigationBar: const HeritageBottomNav(activeIndex: 1),
       body: SingleChildScrollView(
         child: Column(
           children: [
