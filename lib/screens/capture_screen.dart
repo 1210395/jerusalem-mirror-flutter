@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart' show Uint8List;
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img_lib;
 import 'package:path_provider/path_provider.dart';
 import '../app_state.dart';
 import '../theme.dart';
@@ -77,10 +79,26 @@ class _CaptureScreenState extends State<CaptureScreen> {
   Future<void> _capture() async {
     if (_controller == null || !_controller!.value.isInitialized) return;
     final pic = await _controller!.takePicture();
+    final isFront =
+        _controller!.description.lensDirection == CameraLensDirection.front;
+
+    // Front camera: live preview is mirrored, but the saved JPEG is the
+    // raw sensor data (not mirrored). Flip horizontally so the captured
+    // photo matches what the user saw in the preview.
+    Uint8List bytes = await File(pic.path).readAsBytes();
+    if (isFront) {
+      final decoded = img_lib.decodeImage(bytes);
+      if (decoded != null) {
+        final flipped = img_lib.flipHorizontal(decoded);
+        bytes = Uint8List.fromList(img_lib.encodeJpg(flipped, quality: 92));
+      }
+    }
+
     final dir = await getApplicationDocumentsDirectory();
     final ts = DateTime.now().millisecondsSinceEpoch;
     final dest = '${dir.path}/heritage_capture_$ts.jpg';
-    await File(pic.path).copy(dest);
+    await File(dest).writeAsBytes(bytes);
+
     if (!mounted) return;
     setState(() {
       _countdown = 0;
