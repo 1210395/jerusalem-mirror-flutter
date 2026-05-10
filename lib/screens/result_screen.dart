@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import '../app_state.dart';
 import '../theme.dart';
 import '../widgets/glass_panel.dart';
@@ -22,7 +24,6 @@ class ResultScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // Hero image background
           Positioned.fill(
             child: imageUrl != null
                 ? Image.network(
@@ -32,7 +33,6 @@ class ResultScreen extends StatelessWidget {
                   )
                 : _placeholder(context),
           ),
-          // Vignette
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -48,7 +48,6 @@ class ResultScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Overlay content
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -61,8 +60,11 @@ class ResultScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isArabic ? 'انعكاسك التراثي' : 'YOUR HERITAGE REFLECTION',
-                          style: HeritageTheme.labelCaps(context, vhFactor: 0.012),
+                          isArabic
+                              ? 'انعكاسك التراثي'
+                              : 'YOUR HERITAGE REFLECTION',
+                          style: HeritageTheme.labelCaps(context,
+                              vhFactor: 0.012),
                         ),
                         const SizedBox(height: 8),
                         if (costume != null)
@@ -74,7 +76,8 @@ class ResultScreen extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             '${costume.era}  ·  ${isArabic ? costume.regionAr : costume.regionEn}',
-                            style: HeritageTheme.body(context, vhFactor: 0.014),
+                            style:
+                                HeritageTheme.body(context, vhFactor: 0.014),
                           ),
                         ],
                       ],
@@ -86,19 +89,29 @@ class ResultScreen extends StatelessWidget {
                     child: Row(
                       children: [
                         Container(
-                          width: 80,
-                          height: 80,
+                          width: 96,
+                          height: 96,
+                          padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.qr_code_2,
-                              size: 64,
-                              color: Colors.black,
-                            ),
-                          ),
+                          child: imageUrl != null
+                              ? QrImageView(
+                                  data: imageUrl,
+                                  version: QrVersions.auto,
+                                  backgroundColor: Colors.white,
+                                  // ignore: deprecated_member_use
+                                  foregroundColor: Colors.black,
+                                  padding: EdgeInsets.zero,
+                                )
+                              : const Center(
+                                  child: Icon(
+                                    Icons.qr_code_2,
+                                    size: 64,
+                                    color: Colors.black26,
+                                  ),
+                                ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -112,9 +125,13 @@ class ResultScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                isArabic
-                                    ? 'امسح الرمز لتحميل تذكارك'
-                                    : 'Scan to download your souvenir',
+                                imageUrl == null
+                                    ? (isArabic
+                                        ? 'قيد الإنشاء…'
+                                        : 'Generating…')
+                                    : (isArabic
+                                        ? 'امسح الرمز لمشاهدة صورتك'
+                                        : 'Scan to view your reflection'),
                                 style: HeritageTheme.headlineMd(context,
                                     vhFactor: 0.018),
                               ),
@@ -151,17 +168,9 @@ class ResultScreen extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  isArabic
-                                      ? 'وظيفة المشاركة قيد الإعداد'
-                                      : 'Share coming soon',
-                                ),
-                              ),
-                            );
-                          },
+                          onPressed: imageUrl == null
+                              ? null
+                              : () => _share(context, imageUrl, costume?.nameEn),
                           icon: const Icon(Icons.share,
                               color: HeritageColors.onPrimary),
                           label: Text(
@@ -172,6 +181,8 @@ class ResultScreen extends StatelessWidget {
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: HeritageColors.primaryContainer,
+                            disabledBackgroundColor:
+                                HeritageColors.primaryContainer.withOpacity(0.3),
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -190,32 +201,46 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _share(
+      BuildContext context, String imageUrl, String? costumeName) async {
+    final isArabic = appState.locale == 'ar';
+    final text = isArabic
+        ? 'انعكاسي التراثي من مرآة القدس${costumeName != null ? ' - $costumeName' : ''}\n$imageUrl'
+        : 'My Jerusalem Heritage reflection${costumeName != null ? ' - $costumeName' : ''}\n$imageUrl';
+    await Share.share(text);
+  }
+
   Widget _placeholder(BuildContext context) {
-    return Image.asset(
-      'assets/images/souvenir_bg.png',
-      fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) {
-        final c = appState.selectedCostume;
-        return Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(c?.colorHex ?? 0xFF2A2B1B),
-                HeritageColors.background,
-              ],
-            ),
-          ),
-          child: const Center(
-            child: Icon(
-              Icons.account_balance,
-              size: 200,
-              color: Color(0x33D4AF37),
-            ),
-          ),
-        );
-      },
+    final c = appState.selectedCostume;
+    if (c != null) {
+      return Image.asset(
+        'assets/images/costumes/${c.id}.jpg',
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _solidFallback(c),
+      );
+    }
+    return _solidFallback(c);
+  }
+
+  Widget _solidFallback(dynamic c) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(c?.colorHex ?? 0xFF2A2B1B),
+            HeritageColors.background,
+          ],
+        ),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.account_balance,
+          size: 200,
+          color: Color(0x33D4AF37),
+        ),
+      ),
     );
   }
 }

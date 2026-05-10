@@ -19,7 +19,7 @@ class ProfileScreen extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/images/profile_bg.png',
+            'assets/images/welcome_hero.jpg',
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) => Container(
               color: HeritageColors.background,

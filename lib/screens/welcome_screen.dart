@@ -42,7 +42,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/images/welcome_bg.png',
+            'assets/images/welcome_hero.jpg',
             fit: BoxFit.cover,
             alignment: Alignment.center,
             errorBuilder: (_, __, ___) => Container(

@@ -19,14 +19,7 @@ class CostumeScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            'assets/images/costume_bg.png',
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(
-              color: HeritageColors.background,
-            ),
-          ),
-          Container(color: Colors.black.withOpacity(0.65)),
+          Container(color: HeritageColors.background),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -131,24 +124,40 @@ class _CostumeCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
+              Image.asset(
+                'assets/images/costumes/${costume.id}.jpg',
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(costume.colorHex).withOpacity(0.9),
+                        Color(costume.colorHex).withOpacity(0.4),
+                        HeritageColors.background,
+                      ],
+                    ),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.checkroom,
+                      size: 80,
+                      color: Colors.white.withOpacity(0.25),
+                    ),
+                  ),
+                ),
+              ),
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Color(costume.colorHex).withOpacity(0.9),
-                      Color(costume.colorHex).withOpacity(0.4),
-                      HeritageColors.background,
+                      Colors.transparent,
+                      Color(0x99131407),
                     ],
                   ),
-                ),
-              ),
-              Center(
-                child: Icon(
-                  Icons.checkroom,
-                  size: 80,
-                  color: Colors.white.withOpacity(0.25),
                 ),
               ),
               Positioned(

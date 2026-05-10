@@ -44,7 +44,7 @@ class GarmentDetailScreen extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   Image.asset(
-                    'assets/images/garment_hero.png',
+                    'assets/images/costumes/${costume.id}.jpg',
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Center(
                       child: Icon(

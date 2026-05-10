@@ -236,23 +236,12 @@ class _CaptureScreenState extends State<CaptureScreen> {
     if (_capturedPath != null) {
       return Image.file(File(_capturedPath!), fit: BoxFit.cover);
     }
-    final preview = _controller!.value.previewSize;
-    if (preview == null) {
-      return CameraPreview(_controller!);
-    }
-    return ClipRect(
-      child: OverflowBox(
-        alignment: Alignment.center,
-        maxWidth: double.infinity,
-        maxHeight: double.infinity,
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: preview.height,
-            height: preview.width,
-            child: CameraPreview(_controller!),
-          ),
-        ),
+    return Container(
+      color: Colors.black,
+      alignment: Alignment.center,
+      child: AspectRatio(
+        aspectRatio: 1 / _controller!.value.aspectRatio,
+        child: CameraPreview(_controller!),
       ),
     );
   }
